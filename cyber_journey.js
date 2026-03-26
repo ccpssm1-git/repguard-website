@@ -668,7 +668,84 @@ document.addEventListener("DOMContentLoaded", () => {
                 ease: "power2.out",
                 overwrite: "auto"
             });
+            // Brand logo 3D tilt
+            gsap.to(".logo-area", {
+                rotateY: xPct * 10,
+                rotateX: yPct * -10,
+                duration: 0.8,
+                ease: "power2.out",
+                overwrite: "auto"
+            });
         }, { passive: true });
     }
+
+    // --- 3D Hover & Magnetic Logic for Buttons ---
+    const threeDButtons = document.querySelectorAll(".three-d-hover");
+    threeDButtons.forEach(btn => {
+        btn.addEventListener("mousemove", (e) => {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            // Magnetic effect: button center slightly follows mouse
+            const moveX = (x - centerX) * 0.4;
+            const moveY = (y - centerY) * 0.4;
+            
+            // Tilt relative to magnetic center
+            const tiltX = (y - centerY) / 3;
+            const tiltY = (centerX - x) / 3;
+            
+            gsap.to(btn, {
+                x: moveX,
+                y: moveY,
+                rotateX: tiltX,
+                rotateY: tiltY,
+                scale: 1.05,
+                translateZ: 30,
+                duration: 0.1,
+                ease: "power2.out",
+                overwrite: "auto"
+            });
+            
+            // Set CSS mouse variables for aura effect
+            btn.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
+            btn.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+        });
+
+        btn.addEventListener("mouseleave", () => {
+            gsap.to(btn, {
+                x: 0,
+                y: 0,
+                rotateX: 0,
+                rotateY: 0,
+                translateZ: 0,
+                scale: 1,
+                duration: 0.6,
+                ease: "elastic.out(1, 0.4)",
+                overwrite: "auto"
+            });
+        });
+    });
+
+    // --- Hero 3D Grid Background ---
+    const gridContainer = document.createElement("div");
+    gridContainer.className = "hero-3d-grid";
+    document.querySelector("#scene-intro")?.prepend(gridContainer);
+    
+    // Ambient scroll parallax for grid
+    gsap.to(".hero-3d-grid", {
+        y: 200,
+        rotateX: 60,
+        opacity: 0,
+        scrollTrigger: {
+            trigger: "#scene-intro",
+            start: "top top",
+            end: "bottom top",
+            scrub: true
+        }
+    });
 
 });
